@@ -1,6 +1,6 @@
+import LinearAlgebra.Vector;
 import OtherThings.*;
 import LinearAlgebra.*;
-import LinearAlgebra.Vector;
 
 import java.io.IOException;
 import java.util.*;
@@ -35,7 +35,27 @@ public class DifferentialEquation {
     public void setInitialCondition(Point2D initialCondition) {
         this.initialCondition = initialCondition;
     }
-    public void AdamsMethod(String pathToFileWithArguments) throws IOException {
+    public Point2D explicitAdamsMethod(Point2D prevApproximation, double step)
+    {
+        Vector prevPointValues = new Vector(new double[]{
+                prevApproximation.getX(), prevApproximation.getY()}, 2);
+        double prevRightSideFunctionValue = this.rightSideFunction.calculatePoint(prevPointValues).getY();
+        return new Point2D(prevApproximation.getX() + step,
+                prevApproximation.getX() + step * prevRightSideFunctionValue);
+    } // РАСЧЕТ НАЧАЛЬНОГО ПРИБЛИЖЕНИЯ ЯВНЫМ МЕТОДОМ АДАМСА ДЛЯ НОВОГО ЗНАЧЕНИЯ РЕШЕНИЯ ОДУ
+    public Point2D evaluateAndCorrect(Point2D prevApproximation, Point2D currentApproximation, double step)
+    {
+        Vector prevRightSideFunctionArguments = new Vector(new double[]{
+                prevApproximation.getX(), prevApproximation.getY()}, 2);
+        Vector currRightSideFunctionArguments = new Vector(new double[]{
+                currentApproximation.getX(), currentApproximation.getY()}, 2);
+        double prevRightSideFunctionValue = this.rightSideFunction.calculatePoint(prevRightSideFunctionArguments).getY();
+        double currRightSideFunctionValue = this.rightSideFunction.calculatePoint(currRightSideFunctionArguments).getY();
+        double nextApproximationValue = currentApproximation.getY() + (step / 2) *
+                (currRightSideFunctionValue + prevRightSideFunctionValue);
+        return new Point2D(currentApproximation.getX(), nextApproximationValue);
+    } // ВЫЧИСЛЕНИЕ И КОРРЕКТИРОВКА ПРИБЛИЖЕНИЯ ДЛЯ НОВОГО ЗНАЧЕНИЯ РЕШЕНИЯ
+    public void implicitAdamsMethod(String pathToFileWithParameters) throws IOException {
         double stepOfMethod = 0.5;
         double halfOfStep = stepOfMethod / 2;
         double rightBorder = this.initialCondition.getX() + 10;
@@ -44,9 +64,12 @@ public class DifferentialEquation {
 
         for (double step = functionApproximations.peek().getX(); step < rightBorder; step += stepOfMethod)
         {
-            Point2D nextApproximation = new Point2D(step, functionApproximations.peek().getY()
-                    + this.rightSideFunction.calculatePoint(new Vector(new double[]{
-                            step, functionApproximations.peek().getY()}, 2)).getY());
+            Point2D prevApproximation = functionApproximations.peek();
+            Point2D currentApproximation = this.explicitAdamsMethod(prevApproximation, stepOfMethod);
+            /*for (int i = 0; i < 3; i++) {
+                currentApproximation = this.evaluateAndCorrect(prevApproximation, currentApproximation, stepOfMethod);
+            } // ИТЕРАЦИОННЫЙ ПРОЦЕСС ВЫЧИСЛЕНИЯ И КОРРЕКТИРОВКИ*/
+            Point2D nextApproximation = this.evaluateAndCorrect(prevApproximation, currentApproximation, stepOfMethod);
             functionApproximations.push(nextApproximation);
         }
         this.solutionFunction = new MathFunctionOperations(new ArrayList<>(functionApproximations));
