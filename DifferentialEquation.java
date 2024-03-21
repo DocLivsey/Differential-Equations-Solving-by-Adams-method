@@ -2,7 +2,7 @@ import LinearAlgebra.Vector;
 import OtherThings.*;
 import LinearAlgebra.*;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 public class DifferentialEquation {
@@ -56,20 +56,21 @@ public class DifferentialEquation {
         return new Point2D(currentApproximation.getX(), nextApproximationValue);
     } // ВЫЧИСЛЕНИЕ И КОРРЕКТИРОВКА ПРИБЛИЖЕНИЯ ДЛЯ НОВОГО ЗНАЧЕНИЯ РЕШЕНИЯ
     public void implicitAdamsMethod(String pathToFileWithParameters) throws IOException {
-        double stepOfMethod = 0.5;
+        double stepOfMethod = 1;
         double halfOfStep = stepOfMethod / 2;
-        double rightBorder = this.initialCondition.getX() + 10;
+        double stepForCalculation = stepOfMethod;
+        double rightBorder = this.initialCondition.getX() + 5;
         Stack<Point2D> functionApproximations = new Stack<>();
         functionApproximations.push(this.initialCondition.clonePoint());
 
-        for (double step = functionApproximations.peek().getX(); step < rightBorder; step += stepOfMethod)
+        for (double step = functionApproximations.peek().getX(); step < rightBorder; step += stepForCalculation)
         {
             Point2D prevApproximation = functionApproximations.peek();
-            Point2D currentApproximation = this.explicitAdamsMethod(prevApproximation, stepOfMethod);
+            Point2D currentApproximation = this.explicitAdamsMethod(prevApproximation, stepForCalculation);
             /*for (int i = 0; i < 3; i++) {
                 currentApproximation = this.evaluateAndCorrect(prevApproximation, currentApproximation, stepOfMethod);
             } // ИТЕРАЦИОННЫЙ ПРОЦЕСС ВЫЧИСЛЕНИЯ И КОРРЕКТИРОВКИ*/
-            Point2D nextApproximation = this.evaluateAndCorrect(prevApproximation, currentApproximation, stepOfMethod);
+            Point2D nextApproximation = this.evaluateAndCorrect(prevApproximation, currentApproximation, stepForCalculation);
             functionApproximations.push(nextApproximation);
         }
         this.solutionFunction = new MathFunctionOperations(new ArrayList<>(functionApproximations));
