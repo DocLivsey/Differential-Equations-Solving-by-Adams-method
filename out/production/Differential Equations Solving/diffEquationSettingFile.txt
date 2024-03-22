@@ -1,0 +1,4 @@
+# parameters
+step of method = 0.01;
+right border = 10;
+epsilon = 1E-5;
