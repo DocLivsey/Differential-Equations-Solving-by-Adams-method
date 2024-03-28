@@ -5,7 +5,7 @@ import LinearAlgebra.*;
 import java.io.*;
 import java.util.*;
 
-public class DifferentialEquation extends MathBase {
+public class DifferentialEquation extends NumericalBase {
     protected final HashMap<String, Double> parametersTable = new HashMap<>();
     protected double epsilon = 1E-5;
     protected MathImplicitFunctionOperations rightSideFunction; // F(x, y)
@@ -145,10 +145,13 @@ public class DifferentialEquation extends MathBase {
             Point2D prevApproximation = functionApproximations.peek();
             Point2D currentApproximation = this.explicitAdamsMethod(prevApproximation, stepOfMethod);
             Point2D nextApproximation = this.evaluateAndCorrect(prevApproximation, currentApproximation, stepOfMethod);
+            int iterations = 0;
             do {
+                iterations++;
                 currentApproximation = nextApproximation.clonePoint();
                 nextApproximation = this.evaluateAndCorrect(prevApproximation, currentApproximation, stepOfMethod);
-            } while (Math.abs(nextApproximation.getY() - currentApproximation.getY()) >= this.epsilon);
+            } while (Math.abs(nextApproximation.getY() - currentApproximation.getY()) >= this.epsilon
+                    && iterations < 1000);
             functionApproximations.push(nextApproximation);
         }
         this.solutionFunction = new MathFunctionOperations(new ArrayList<>(functionApproximations));
