@@ -3,21 +3,23 @@ import OtherThings.PrettyOutput;
 import Parsers.FileParser;
 
 import java.io.*;
+import java.util.ArrayList;
 
 public class ConsoleTest {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, ReflectiveOperationException {
         String pathToParametersFile = "diffEquationSettingFile.txt";
         numericalAdamsMethodsExamples(pathToParametersFile);
+        CauchyProblemSolving.System system = new CauchyProblemSolving.System(
+                null, null, null);
     }
-    public static void numericalAdamsMethodsExamples(String pathToSettingsFile) throws IOException {
+    public static void numericalAdamsMethodsExamples(String pathToSettingsFile) throws IOException, ReflectiveOperationException {
         double example_number = FileParser.SettingsParser.getParametersTable(pathToSettingsFile).get("example");
         MathImplicitFunction function = getFunctionExample((int)example_number);
         String pathToImplicitFuncPoints = "pointsForImplicitFuncInput.txt";
         Point2D initCondition = Point2D.readPointFromFile(pathToImplicitFuncPoints);
-        DifferentialEquation diffEquation = new DifferentialEquation(
+        CauchyProblemSolving diffEquation = new CauchyProblemSolving(
                 pathToImplicitFuncPoints, initCondition, function);
         diffEquation.implicitAdamsMethod(pathToSettingsFile);
-
     }
     public static MathImplicitFunction getFunctionExample(int number)
     {
