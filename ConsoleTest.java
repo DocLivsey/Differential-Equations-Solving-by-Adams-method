@@ -11,6 +11,8 @@ public class ConsoleTest {
         numericalAdamsMethodsExamples(pathToParametersFile);
         CauchyProblemSolving.System system = new CauchyProblemSolving.System(
                 null, null, null);
+        InitialCondition initialCondition = new InitialCondition("1, 4, 2", 2);
+        System.out.println(initialCondition);
     }
     public static void numericalAdamsMethodsExamples(String pathToSettingsFile) throws IOException, ReflectiveOperationException {
         double example_number = FileParser.SettingsParser.getParametersTable(pathToSettingsFile).get("example");

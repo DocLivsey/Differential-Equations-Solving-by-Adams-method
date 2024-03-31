@@ -129,14 +129,17 @@ public class CauchyProblemSolving extends DifferentialEquation {
         this.solutionFunction.writePointsInFile("solutionFunctionPointsOutput.txt");
     }
     public static class System extends DifferentialEquation.System {
-        protected ArrayList<Double> initialConditions;
+        protected InitialCondition initialConditions;
         public System(ArrayList<DifferentialEquation> differentialEquationsSystem, String pathToParametersFile,
-                      ArrayList<Double> initialConditions) throws IOException, ReflectiveOperationException {
+                      InitialCondition initialConditions) throws IOException, ReflectiveOperationException {
             super(differentialEquationsSystem, pathToParametersFile);
             this.initialConditions = initialConditions;
         }
-        public void a() {
-            throw new RuntimeException("");
+        public InitialCondition getInitialConditions() {
+            return initialConditions;
+        }
+        public void setInitialConditions(InitialCondition initialConditions) {
+            this.initialConditions = initialConditions;
         }
     }
 }
