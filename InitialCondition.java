@@ -45,7 +45,6 @@ public class InitialCondition extends NumericalBase {
     public void setInitConditionFromString(String initConditionStr, int initConditionDimension)
     {
         String[] splitPoint = initConditionStr.trim().split("[\\s,]+");
-        Arrays.stream(splitPoint).forEach(System.out::println);
         if (splitPoint.length == initConditionDimension + 1)
         {
             for (int i = 0; i < initConditionDimension; i++)
@@ -62,11 +61,13 @@ public class InitialCondition extends NumericalBase {
             throw new RuntimeException(PrettyOutput.ERROR +
                     "Ошибка! Неверно введена размерность точки или неверно введена сама точка" + PrettyOutput.RESET);
     }
-    public static InitialCondition readInitConditionFromFile(String pathToFile) throws IOException {
+    public static InitialCondition readInitConditionFromFile(String pathToFile, int dimension) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(pathToFile));
         String initConditionStr = reader.readLine();
-        int dimension = initConditionStr.split("[\\s,]+").length;
         return new InitialCondition(initConditionStr, dimension);
+    }
+    public boolean hasNanValues() {
+        return Double.isNaN(this.getX()) || this.getVectorY().isNanVector();
     }
     public void print()
     {
