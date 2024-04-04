@@ -4,24 +4,48 @@ import Parsers.FileParser;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ConsoleTest {
+    public static String pathToDifferentialEquationSettingsFile = "diffEquationSettingFile.txt";
+    public static String pathToDifferentialEquationsSystemSettingsFile = "diffEqSystemSettingFile.txt";
     public static void main(String[] args) throws IOException, ReflectiveOperationException {
-        String pathToParametersFile = "diffEquationSettingFile.txt";
-        numericalAdamsMethodsExamples(pathToParametersFile);
-        CauchyProblemSolving.System system = new CauchyProblemSolving.System(
-                null, null, null);
-        InitialCondition initialCondition = new InitialCondition("1, 4, 2", 2);
-        System.out.println(initialCondition);
+        numericalSystemAdamsMethodExamples(pathToDifferentialEquationsSystemSettingsFile);
     }
-    public static void numericalAdamsMethodsExamples(String pathToSettingsFile) throws IOException, ReflectiveOperationException {
+    public static void numericalSystemAdamsMethodExamples(String pathToSettingsFile)
+            throws IOException, ReflectiveOperationException {
+        String pathToInitConditions = "pointsForImplicitFuncInput.txt";
+        FileReader fileReader = new FileReader(pathToSettingsFile);
+        fileReader.close();
+        ArrayList<MathImplicitFunction> functions = getFunctionsSystem(1);
+        InitialCondition initCondition = InitialCondition
+                .readInitConditionFromFile(pathToInitConditions, functions.size());
+        CauchyProblemSolving.SystemSolving systemSolving = new CauchyProblemSolving.SystemSolving(
+                functions, initCondition, pathToSettingsFile);
+        System.out.println(systemSolving.getInitialConditions());
+        systemSolving.implicitAdamsMethod(pathToSettingsFile,
+                "solutionFunctionOfSystemPointsOutput.txt");
+    }
+    public static void numericalAdamsMethodsExamples(String pathToSettingsFile)
+            throws IOException, ReflectiveOperationException {
         double example_number = FileParser.SettingsParser.getParametersTable(pathToSettingsFile).get("example");
         MathImplicitFunction function = getFunctionExample((int)example_number);
         String pathToImplicitFuncPoints = "pointsForImplicitFuncInput.txt";
         Point2D initCondition = Point2D.readPointFromFile(pathToImplicitFuncPoints);
         CauchyProblemSolving diffEquation = new CauchyProblemSolving(
                 pathToImplicitFuncPoints, initCondition, function);
-        diffEquation.implicitAdamsMethod(pathToSettingsFile);
+        diffEquation.implicitAdamsMethod(pathToSettingsFile, "solutionFunctionPointsOutput.txt");
+    }
+    public static ArrayList<MathImplicitFunction> getFunctionsSystem(int number)
+    {
+        return switch (number) {
+            case 1 -> new ArrayList<>(List.of(
+                    (x) -> new PointMultiD(x, x.getItem(0) + x.getItem(1)),
+                    (x) -> new PointMultiD(x, x.getItem(0) * x.getItem(1))));
+            case 2 -> new ArrayList<>(List.of((x) -> new PointMultiD(), (x) -> new PointMultiD()));
+            default -> throw new RuntimeException(PrettyOutput.ERROR + "there is no function at the given number: " +
+                    PrettyOutput.COMMENT + number + PrettyOutput.RESET);
+        };
     }
     public static MathImplicitFunction getFunctionExample(int number)
     {

@@ -3,8 +3,7 @@ import LinearAlgebra.Vector;
 import OtherThings.PrettyOutput;
 import Parsers.FileParser;
 
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
 import java.util.*;
 
 public class CauchyProblemSolving extends DifferentialEquation {
@@ -100,7 +99,7 @@ public class CauchyProblemSolving extends DifferentialEquation {
                 (currRightSideFunctionValue + prevRightSideFunctionValue);
         return new Point2D(currentApproximation.getX(), nextApproximationValue);
     } // ВЫЧИСЛЕНИЕ И КОРРЕКТИРОВКА ПРИБЛИЖЕНИЯ ДЛЯ НОВОГО ЗНАЧЕНИЯ РЕШЕНИЯ
-    public void implicitAdamsMethod(String pathToFileWithParameters) throws IOException {
+    public void implicitAdamsMethod(String pathToFileWithParameters, String pathToSolutionsPointsOutput) throws IOException {
         if (!this.isParameterOfMethodUpload(List.of("step of method", "right border")))
         {
             super.updateVariablesList(List.of("step of method", "right border"));
@@ -126,20 +125,76 @@ public class CauchyProblemSolving extends DifferentialEquation {
             functionApproximations.push(nextApproximation);
         }
         this.solutionFunction = new MathFunctionOperations(new ArrayList<>(functionApproximations));
-        this.solutionFunction.writePointsInFile("solutionFunctionPointsOutput.txt");
+        if (pathToSolutionsPointsOutput != null)
+            this.writeSolutionsPointsInFile(pathToSolutionsPointsOutput);
     }
-    public static class System extends DifferentialEquation.System {
+    public void writeSolutionsPointsInFile(String pathToFile) throws IOException {
+        if (this.solutionFunction != null)
+            this.solutionFunction.writePointsInFile(pathToFile);
+        else
+            throw new RuntimeException(
+                    PrettyOutput.ERROR + "Решение не найдено либо не было записано" + PrettyOutput.RESET);
+    }
+    public static class SystemSolving extends EquationsSystem {
+        protected final HashMap<String, Double> parametersTable = new HashMap<>();
         protected InitialCondition initialConditions;
-        public System(ArrayList<DifferentialEquation> differentialEquationsSystem, String pathToParametersFile,
-                      InitialCondition initialConditions) throws IOException, ReflectiveOperationException {
+        public SystemSolving(ArrayList<DifferentialEquation> differentialEquationsSystem, String pathToParametersFile,
+                             InitialCondition initialConditions) throws IOException, ReflectiveOperationException {
             super(differentialEquationsSystem, pathToParametersFile);
-            this.initialConditions = initialConditions;
+            super.updateVariablesList(List.of("step of method", "x0", "y0"));
+            if (pathToParametersFile != null) {
+                this.setInitialConditions(pathToParametersFile);
+            } if (this.initialConditions == null || this.initialConditions.hasNanValues()) {
+                if (initialConditions != null && !initialConditions.hasNanValues())
+                    this.initialConditions = initialConditions;
+                else
+                    throw new RuntimeException(PrettyOutput.ERROR +
+                            "ОШИБКА! Для решения задачи Коши необходимо задать начальные условия" + PrettyOutput.RESET);
+            }
+        }
+        public SystemSolving(ArrayList<DifferentialEquation> differentialEquationsSystem,
+                             InitialCondition initialConditions) throws IOException, ReflectiveOperationException {
+            this(differentialEquationsSystem, null, initialConditions);
+        }
+        public SystemSolving(DifferentialEquation differentialEquation1, DifferentialEquation differentialEquation2,
+                             DifferentialEquation differentialEquation3, String pathToParametersFile,
+                             InitialCondition initialConditions) throws IOException, ReflectiveOperationException {
+            this(new ArrayList<>(List.of(differentialEquation1, differentialEquation2, differentialEquation3)),
+                    pathToParametersFile, initialConditions);
+        }
+        public SystemSolving(ArrayList<MathImplicitFunction> mathImplicitFunctions, InitialCondition initialConditions,
+                             String pathToParametersFile) throws IOException, ReflectiveOperationException {
+            this(new ArrayList<>(){{
+                int dimension = mathImplicitFunctions.size() + 1;
+                for (int index = 0; index < dimension - 1; index++) {
+                    ArrayList<PointMultiD> points = new ArrayList<>(List.of(new PointMultiD(new Vector(new double[]{
+                            initialConditions.getX(), initialConditions.getY(index)}, 3), Double.NaN)));
+                    this.add(new DifferentialEquation(pathToParametersFile, null,
+                            mathImplicitFunctions.get(index), points, null));
+                }
+            }}, pathToParametersFile, initialConditions);
         }
         public InitialCondition getInitialConditions() {
             return initialConditions;
         }
         public void setInitialConditions(InitialCondition initialConditions) {
             this.initialConditions = initialConditions;
+        }
+        public void setInitialConditions(String pathToParametersFile) throws IOException {
+            HashMap<String, Double> initConditionCoordinatesTable = FileParser.SettingsParser.getParametersTable(pathToParametersFile);
+        }
+        public void implicitAdamsMethod(String pathToFileWithParameters, String pathToSolutionsPointsOutput)
+                throws IOException, ReflectiveOperationException {
+            int index = 0;
+            System.out.println(this.initialConditions);
+            for (var differentialEquation : this.differentialEquationsSystem)
+            {
+                Point2D initCondition = new Point2D(this.initialConditions.getX(), this.initialConditions.getY(index++));
+                CauchyProblemSolving cauchyProblem = differentialEquation.setTheCauchyProblem(initCondition);
+                System.out.println(pathToSolutionsPointsOutput + index);
+                cauchyProblem.implicitAdamsMethod(
+                        pathToFileWithParameters, pathToSolutionsPointsOutput + index);
+            }
         }
     }
 }

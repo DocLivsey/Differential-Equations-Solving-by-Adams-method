@@ -1,5 +1,3 @@
-import LinearAlgebra.Vector;
-import OtherThings.*;
 import LinearAlgebra.*;
 
 import java.io.*;
@@ -42,15 +40,16 @@ public class DifferentialEquation extends NumericalBase {
             throws IOException, ReflectiveOperationException {
         return new CauchyProblemSolving(null, this.rightSideFunction, initialCondition);
     }
-    protected static class System extends NumericalBase {
+    protected static class EquationsSystem extends NumericalBase {
         protected ArrayList<DifferentialEquation> differentialEquationsSystem;
-        public System(ArrayList<DifferentialEquation> differentialEquationsSystem,
-                                           String pathToParametersFile) throws IOException, ReflectiveOperationException {
+        public EquationsSystem(ArrayList<DifferentialEquation> differentialEquationsSystem,
+                               String pathToParametersFile) throws IOException, ReflectiveOperationException {
             if (pathToParametersFile != null) {
                 super.setFields(pathToParametersFile);
                 this.setFields(pathToParametersFile);
             }
             this.differentialEquationsSystem = differentialEquationsSystem;
+            this.differentialEquationsSystem.removeAll(Collections.singleton(null));
         }
         public ArrayList<DifferentialEquation> getDifferentialEquationsSystem() {
             return differentialEquationsSystem;
