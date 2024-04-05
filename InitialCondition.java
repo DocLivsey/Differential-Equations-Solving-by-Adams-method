@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 
 public class InitialCondition extends NumericalBase {
     protected double x;
@@ -74,5 +75,10 @@ public class InitialCondition extends NumericalBase {
         System.out.println(PrettyOutput.HEADER_OUTPUT + "Начальное значение размерностью: " +
                 (this.getVectorY().getVectorSize()) + PrettyOutput.RESET);
         System.out.println("(" + this + ")");
+    }
+    public HashMap<Integer, Double> getEquationsAndInitConditionsHashTable()
+    {
+
+        return null;
     }
 }
