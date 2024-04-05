@@ -8,64 +8,86 @@ import java.util.*;
 
 public class CauchyProblemSolving extends DifferentialEquation {
     protected final HashMap<String, Double> parametersTable = new HashMap<>();
-    protected Point2D initialCondition; // y(x0) = y0 - The Cauchy`s problem
-    public CauchyProblemSolving(String pathToParametersFile, String pathToPoints3D, MathImplicitFunction function,
-                                ArrayList<PointMultiD> points3D, Point2D initialCondition,
-                                MathImplicitFunctionOperations rightSideFunction)
-            throws IOException, ReflectiveOperationException {
-        super(pathToParametersFile, pathToPoints3D, function, points3D, rightSideFunction);
+    protected InitialCondition initialCondition; // y(x0) = y0 - The Cauchy`s problem
+    public CauchyProblemSolving(String pathToParametersFile, String pathToPointsMD, ArrayList<PointMultiD> pointsMD,
+                                MathImplicitFunctionOperations rightSideFunction, InitialCondition initialCondition,
+                                MathImplicitFunction function, boolean isEquationFromSystem, Integer equationsIndex,
+                                int dimension) throws IOException, ReflectiveOperationException {
+        super(pathToParametersFile, pathToPointsMD, function, pointsMD, rightSideFunction,
+                isEquationFromSystem, equationsIndex, dimension);
         super.updateVariablesList(List.of("step of method", "x0", "y0"));
         if (pathToParametersFile != null) {
             this.setInitialCondition(pathToParametersFile);
-        } else if (this.initialCondition == null || this.initialCondition.isNanPoint()) {
-            if (initialCondition != null && !initialCondition.isNanPoint())
+        } else if (this.initialCondition == null || this.initialCondition.hasNanValues()) {
+            if (initialCondition != null && !initialCondition.hasNanValues())
                 this.initialCondition = initialCondition;
             else
                 throw new RuntimeException(PrettyOutput.ERROR +
                         "ОШИБКА! Для решения задачи Коши необходимо задать начальные условия" + PrettyOutput.RESET);
         }
     }
-    public CauchyProblemSolving(String pathToParametersFile, String pathToPoints3D, Point2D initialCondition,
+    public CauchyProblemSolving(String pathToParametersFile, String pathToPointsMD, InitialCondition initialCondition,
+                                boolean isEquationFromSystem, Integer equationsIndex, int dimension,
                                 MathImplicitFunction function) throws IOException, ReflectiveOperationException {
-        this(pathToParametersFile, pathToPoints3D, function, null, initialCondition, null);
+        this(pathToParametersFile, pathToPointsMD, null, null, initialCondition, function,
+                isEquationFromSystem, equationsIndex, dimension);
     }
-    public CauchyProblemSolving(String pathToPoints3D, Point2D initialCondition, MathImplicitFunction function)
+    public CauchyProblemSolving(String pathToParametersFile, String pathToPointsMD, InitialCondition initialCondition,
+                                MathImplicitFunction function) throws IOException, ReflectiveOperationException {
+        this(pathToParametersFile, pathToPointsMD, initialCondition, false,
+                null, 2, function);
+    }
+    public CauchyProblemSolving(String pathToPointsMD, InitialCondition initialCondition, MathImplicitFunction function)
             throws IOException, ReflectiveOperationException {
-        this(null, pathToPoints3D, initialCondition, function);
+        this(null, pathToPointsMD, initialCondition, function);
     }
-    public CauchyProblemSolving(String pathToParametersFile, ArrayList<PointMultiD> points3D, Point2D initialCondition,
+    public CauchyProblemSolving(String pathToParametersFile, ArrayList<PointMultiD> pointsMD, InitialCondition initialCondition,
+                                boolean isEquationFromSystem, Integer equationsIndex, int dimension,
                                 MathImplicitFunction function) throws IOException, ReflectiveOperationException {
-        this(pathToParametersFile, null, function, points3D, initialCondition, null);
+        this(pathToParametersFile, null, pointsMD, null, initialCondition, function,
+                isEquationFromSystem, equationsIndex, dimension);
     }
-    public CauchyProblemSolving(ArrayList<PointMultiD> points3D, Point2D initialCondition, MathImplicitFunction function)
+    public CauchyProblemSolving(String pathToParametersFile, ArrayList<PointMultiD> pointsMD, InitialCondition initialCondition,
+                                MathImplicitFunction function) throws IOException, ReflectiveOperationException {
+        this(pathToParametersFile, pointsMD, initialCondition,
+                false, null, 2, function);
+    }
+    public CauchyProblemSolving(ArrayList<PointMultiD> points3D, InitialCondition initialCondition, MathImplicitFunction function)
             throws IOException, ReflectiveOperationException {
         this(null, points3D, initialCondition, function);
     }
     public CauchyProblemSolving(String pathToParametersFile, MathImplicitFunctionOperations rightSideFunction,
-                                Point2D initialCondition) throws IOException, ReflectiveOperationException {
-        this(pathToParametersFile, null, null, null, initialCondition, rightSideFunction);
+                                InitialCondition initialCondition, boolean isEquationFromSystem, Integer equationsIndex,
+                                int dimension) throws IOException, ReflectiveOperationException {
+        this(pathToParametersFile, null, null, rightSideFunction, initialCondition, null,
+                isEquationFromSystem, equationsIndex, dimension);
     }
-    public CauchyProblemSolving(Point2D initialCondition, MathImplicitFunctionOperations rightSideFunction)
+    public CauchyProblemSolving(String pathToParametersFile, MathImplicitFunctionOperations rightSideFunction,
+                                InitialCondition initialCondition) throws IOException, ReflectiveOperationException {
+        this(pathToParametersFile, rightSideFunction, initialCondition,
+                false, null, 2);
+    }
+    public CauchyProblemSolving(InitialCondition initialCondition, MathImplicitFunctionOperations rightSideFunction)
             throws IOException, ReflectiveOperationException {
         this(null, rightSideFunction, initialCondition);
     }
     public HashMap<String, Double> getParametersTable() {
         return parametersTable;
     }
-    public Point2D getInitialCondition() {
+    public InitialCondition getInitialCondition() {
         return initialCondition;
     }
     public void setParametersTable(String pathToParametersFile) throws IOException {
         this.parametersTable.putAll(getVariablesTable(pathToParametersFile));
     }
-    public void setInitialCondition(Point2D initialCondition) {
+    public void setInitialCondition(InitialCondition initialCondition) {
         this.initialCondition = initialCondition;
     }
     public void setInitialCondition(String pathToParametersFile) throws IOException {
         HashMap<String, Double> initConditionCoordinatesTable = FileParser.SettingsParser.getParametersTable(pathToParametersFile);
         double x0 = initConditionCoordinatesTable.get("x0");
         double y0 = initConditionCoordinatesTable.get("y0");
-        this.initialCondition = new Point2D(x0, y0);
+        this.initialCondition = new InitialCondition(x0, new Vector(new double[]{y0}, 1));
     }
     public boolean isParameterOfMethodUpload(Collection<String> parameters)
     {
@@ -109,7 +131,8 @@ public class CauchyProblemSolving extends DifferentialEquation {
         double stepOfMethod = this.parametersTable.get("StepOfMethod".toLowerCase());
         double rightBorder = this.parametersTable.get("RightBorder".toLowerCase());
         Stack<Point2D> functionApproximations = new Stack<>();
-        functionApproximations.push(this.initialCondition.clonePoint());
+        functionApproximations.push(new Point2D(
+                this.initialCondition.getX(), this.initialCondition.getY(this.equationsIndex)));
         for (double step = functionApproximations.peek().getX(); step < rightBorder; step += stepOfMethod)
         {
             Point2D prevApproximation = functionApproximations.peek();
@@ -170,7 +193,8 @@ public class CauchyProblemSolving extends DifferentialEquation {
                     ArrayList<PointMultiD> points = new ArrayList<>(List.of(new PointMultiD(new Vector(new double[]{
                             initialConditions.getX(), initialConditions.getY(index)}, 3), Double.NaN)));
                     this.add(new DifferentialEquation(pathToParametersFile, null,
-                            mathImplicitFunctions.get(index), points, null));
+                            mathImplicitFunctions.get(index), points, null,
+                            true, index, dimension - 1));
                 }
             }}, pathToParametersFile, initialConditions);
         }
@@ -185,16 +209,7 @@ public class CauchyProblemSolving extends DifferentialEquation {
         }
         public void implicitAdamsMethod(String pathToFileWithParameters, String pathToSolutionsPointsOutput)
                 throws IOException, ReflectiveOperationException {
-            int index = 0;
-            System.out.println(this.initialConditions);
-            for (var differentialEquation : this.differentialEquationsSystem)
-            {
-                Point2D initCondition = new Point2D(this.initialConditions.getX(), this.initialConditions.getY(index++));
-                CauchyProblemSolving cauchyProblem = differentialEquation.setTheCauchyProblem(initCondition);
-                System.out.println(pathToSolutionsPointsOutput + index);
-                cauchyProblem.implicitAdamsMethod(
-                        pathToFileWithParameters, pathToSolutionsPointsOutput + index);
-            }
+
         }
     }
 }
