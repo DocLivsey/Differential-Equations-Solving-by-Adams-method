@@ -1,0 +1,7 @@
+#param
+step of method = 0.125;
+right border = 3.0;
+
+#argument
+epsilon = 1.0E-10;
+

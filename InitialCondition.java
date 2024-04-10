@@ -1,4 +1,6 @@
-import LinearAlgebra.*;
+import MathModule.*;
+import MathModule.LinearAlgebra.*;
+import MathModule.LinearAlgebra.Vector;
 import OtherThings.PrettyOutput;
 
 import java.io.BufferedReader;
@@ -69,6 +71,12 @@ public class InitialCondition extends NumericalBase {
     }
     public boolean hasNanValues() {
         return Double.isNaN(this.getX()) || this.getVectorY().isNanVector();
+    }
+    public Vector convertToVector()
+    {
+        Vector convert = this.getVectorY().cloneVector();
+        convert.addItemBefore(this.getX(), 0);
+        return convert;
     }
     public void print()
     {

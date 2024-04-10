@@ -1,5 +1,5 @@
-import LinearAlgebra.*;
-import LinearAlgebra.Vector;
+import MathModule.*;
+import MathModule.LinearAlgebra.*;
 import OtherThings.PrettyOutput;
 
 import java.io.*;
@@ -13,12 +13,11 @@ public class DifferentialEquation extends NumericalBase {
     protected Integer equationsIndex;
     public DifferentialEquation(String pathToParametersFile, String pathToPointsMD, MathImplicitFunction function,
                                 ArrayList<PointMultiD> pointsMD, MathImplicitFunctionOperations rightSideFunction,
-                                boolean isEquationFromSystem, Integer equationsIndex, int dimension)
-            throws IOException, ReflectiveOperationException {
+                                boolean isEquationFromSystem, Integer equationsIndex, int dimension) throws Exception {
         if (pathToParametersFile != null) {
             super.setFields(pathToParametersFile);
             this.setFields(pathToParametersFile);
-        } if (!this.isEquationFromSystem && !isEquationFromSystem) {
+        } if (!isEquationFromSystem) {
             if (equationsIndex != null) {
                 this.isEquationFromSystem = true;
                 this.equationsIndex = equationsIndex;
@@ -31,6 +30,7 @@ public class DifferentialEquation extends NumericalBase {
                 this.equationsIndex = null;
                 throw new RuntimeException(PrettyOutput.ERROR + "Может это уравнение НЕ из системы?" + PrettyOutput.RESET);
             }
+            this.isEquationFromSystem = true;
             this.equationsIndex = equationsIndex;
         } if (rightSideFunction != null) {
             this.rightSideFunction = rightSideFunction;
@@ -45,23 +45,31 @@ public class DifferentialEquation extends NumericalBase {
     public MathFunctionOperations getSolutionFunction() {
         return solutionFunction;
     }
+    public Integer getEquationsIndex() {
+        return equationsIndex;
+    }
+    public boolean isEquationFromSystem() {
+        return isEquationFromSystem;
+    }
     public void setRightSideFunction(MathImplicitFunctionOperations rightSideFunction) {
         this.rightSideFunction = rightSideFunction;
     }
     public void setSolutionFunction(MathFunctionOperations solutionFunction) {
         this.solutionFunction = solutionFunction;
     }
-    @Override
-    public int hashCode() {
-        return super.hashCode();
+    public void setEquationsIndex(Integer equationsIndex) {
+        this.equationsIndex = equationsIndex;
     }
-    public CauchyProblemSolving setTheCauchyProblem(String pathToParametersFile)
-            throws IOException, ReflectiveOperationException {
-        return new CauchyProblemSolving(pathToParametersFile, this.rightSideFunction, null);
+    public void setEquationFromSystem(boolean equationFromSystem) {
+        isEquationFromSystem = equationFromSystem;
     }
-    public CauchyProblemSolving setTheCauchyProblem(InitialCondition initialCondition)
-            throws IOException, ReflectiveOperationException {
-        return new CauchyProblemSolving(null, this.rightSideFunction, initialCondition);
+    public CauchyProblemSolving setTheCauchyProblem(String pathToParametersFile) throws Exception {
+        return new CauchyProblemSolving(pathToParametersFile, this.rightSideFunction, null,
+                this.isEquationFromSystem, this.equationsIndex, this.rightSideFunction.getDimension());
+    }
+    public CauchyProblemSolving setTheCauchyProblem(InitialCondition initialCondition) throws Exception {
+        return new CauchyProblemSolving(null, this.rightSideFunction, initialCondition,
+                this.isEquationFromSystem, this.equationsIndex, this.rightSideFunction.getDimension());
     }
     protected static class EquationsSystem extends NumericalBase {
         protected ArrayList<DifferentialEquation> differentialEquationsSystem;
@@ -72,6 +80,8 @@ public class DifferentialEquation extends NumericalBase {
                 this.setFields(pathToParametersFile);
             }
             this.differentialEquationsSystem = differentialEquationsSystem;
+            for (int index = 0; index < this.differentialEquationsSystem.size(); index++)
+                this.differentialEquationsSystem.get(index).setEquationsIndex(index);
             this.differentialEquationsSystem.removeAll(Collections.singleton(null));
         }
         public ArrayList<DifferentialEquation> getDifferentialEquationsSystem() {
