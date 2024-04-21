@@ -213,13 +213,17 @@ public class CauchyProblemSolving extends DifferentialEquation {
 
         public ArrayList<Point2D> explicitAdamsMethod(ArrayList<Point2D> prevApproximations, double step)
                 throws ReflectiveOperationException, IOException {
+            Vector prevRightSideFunctionsArguments = new Vector(new ArrayList<>(){{
+                this.add(prevApproximations.get(0).getX());
+                prevApproximations.forEach(point -> this.add(point.getY()));
+            }});
             Vector prevPointsValues = new Vector(){{
                 prevApproximations.forEach(point -> this.addElement(point.getY()));
             }};
             Vector prevRightSideFunctionValue = new Vector(){{
-                for (int index = 0; index < differentialEquationsSystem.size(); index++) {
-                    this.addElement(differentialEquationsSystem.get(index).rightSideFunction.calculatePoint(
-                            prevApproximations.get(index).toVector()).getY());
+                for (DifferentialEquation differentialEquation : differentialEquationsSystem) {
+                    this.addElement(differentialEquation.rightSideFunction.calculatePoint(
+                            prevRightSideFunctionsArguments).getY());
                 }
             }};
             Vector nextApproximationsValues = (Vector) prevPointsValues
@@ -234,33 +238,23 @@ public class CauchyProblemSolving extends DifferentialEquation {
                 ArrayList<Point2D> prevApproximations, ArrayList<Point2D> currentApproximations, double step)
                 throws ReflectiveOperationException, IOException {
             Vector prevRightSideFunctionArguments = new Vector(new ArrayList<>(){{
-                prevApproximations.forEach(point -> {
-                    try {
-                        point.toVector();
-                    } catch (ReflectiveOperationException | IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+                this.add(prevApproximations.get(0).getX());
+                prevApproximations.forEach(point -> this.add(point.getY()));
             }});
             Vector currRightSideFunctionArguments = new Vector(new ArrayList<>(){{
-                currentApproximations.forEach(point -> {
-                    try {
-                        point.toVector();
-                    } catch (ReflectiveOperationException | IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+                this.add(currentApproximations.get(0).getX());
+                currentApproximations.forEach(point -> this.add(point.getY()));
             }});
             Vector prevRightSideFunctionValue = new Vector(new ArrayList<>(){{
-                for (int index = 0; index < differentialEquationsSystem.size(); index++) {
-                    this.add(differentialEquationsSystem.get(index).rightSideFunction.calculatePoint(
-                            prevApproximations.get(index).toVector()).getY());
+                for (DifferentialEquation differentialEquation : differentialEquationsSystem) {
+                    this.add(differentialEquation.rightSideFunction.calculatePoint(
+                            prevRightSideFunctionArguments).getY());
                 }
             }});
             Vector currRightSideFunctionValue = new Vector(new ArrayList<>(){{
-                for (int index = 0; index < differentialEquationsSystem.size(); index++) {
-                    this.add(differentialEquationsSystem.get(index).rightSideFunction.calculatePoint(
-                            currentApproximations.get(index).toVector()).getY());
+                for (DifferentialEquation differentialEquation : differentialEquationsSystem) {
+                    this.add(differentialEquation.rightSideFunction.calculatePoint(
+                            currRightSideFunctionArguments).getY());
                 }
             }});
             Vector nextApproximationValue = (Vector) prevRightSideFunctionValue.add(currRightSideFunctionValue
@@ -303,6 +297,10 @@ public class CauchyProblemSolving extends DifferentialEquation {
             System.out.println(functionApproximations);
             for (int equationIndex = 0; equationIndex < this.differentialEquationsSystem.size(); equationIndex++)
             {
+                int finalEquationIndex = equationIndex;
+                this.differentialEquationsSystem.get(equationIndex).setSolutionFunction(new MathFunctionOperations());
+                functionApproximations.forEach(approximations -> this.differentialEquationsSystem.get(finalEquationIndex)
+                        .getSolutionFunction().addPoint(approximations.get(finalEquationIndex)));
                 this.differentialEquationsSystem.get(equationIndex).getSolutionFunction()
                         .writePointsInFile("SolutionsFunction" + equationIndex + "PointsOutput.txt");
             }
