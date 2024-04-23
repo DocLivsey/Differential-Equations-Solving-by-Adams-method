@@ -23,11 +23,11 @@ public class DifferentialEquation extends NumericalBase {
                 this.equationsIndex = equationsIndex;
                 throw new RuntimeException(PrettyOutput.ERROR + "Может это уравнение из системы?" + PrettyOutput.RESET);
             }
-            this.equationsIndex = null;
+            this.equationsIndex = 0;
         } else {
             if (equationsIndex == null) {
                 this.isEquationFromSystem = false;
-                this.equationsIndex = null;
+                this.equationsIndex = 0;
                 throw new RuntimeException(PrettyOutput.ERROR + "Может это уравнение НЕ из системы?" + PrettyOutput.RESET);
             }
             this.isEquationFromSystem = true;
@@ -63,12 +63,12 @@ public class DifferentialEquation extends NumericalBase {
     public void setEquationFromSystem(boolean equationFromSystem) {
         isEquationFromSystem = equationFromSystem;
     }
-    public CauchyProblemSolving setTheCauchyProblem(String pathToParametersFile) throws Exception {
-        return new CauchyProblemSolving(pathToParametersFile, this.rightSideFunction, null,
+    public CauchyProblemSolving_OLD setTheCauchyProblem(String pathToParametersFile) throws Exception {
+        return new CauchyProblemSolving_OLD(pathToParametersFile, this.rightSideFunction, null,
                 this.isEquationFromSystem, this.equationsIndex, this.rightSideFunction.getDimension());
     }
-    public CauchyProblemSolving setTheCauchyProblem(InitialCondition initialCondition) throws Exception {
-        return new CauchyProblemSolving(null, this.rightSideFunction, initialCondition,
+    public CauchyProblemSolving_OLD setTheCauchyProblem(InitialCondition initialCondition) throws Exception {
+        return new CauchyProblemSolving_OLD(null, this.rightSideFunction, initialCondition,
                 this.isEquationFromSystem, this.equationsIndex, this.rightSideFunction.getDimension());
     }
     protected static class EquationsSystem extends NumericalBase {
