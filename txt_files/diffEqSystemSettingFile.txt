@@ -1,0 +1,9 @@
+# field
+epsilon = 1E-5;
+
+# parameters
+count of steps = 10;
+
+step of method = 0.5;
+right border = 8;
+example = 1;

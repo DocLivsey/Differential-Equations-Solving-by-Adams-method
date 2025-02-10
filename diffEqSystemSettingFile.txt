@@ -1,6 +1,0 @@
-# field
-epsilon = 1E-5;
-
-# parameters
-step of method = 0.25;
-right border = 3;

@@ -1,0 +1,17 @@
+0.0;0.0
+0.5;NaN
+1.0;NaN
+1.5;NaN
+2.0;NaN
+2.5;NaN
+3.0;NaN
+3.5;NaN
+4.0;NaN
+4.5;NaN
+5.0;NaN
+5.5;NaN
+6.0;NaN
+6.5;NaN
+7.0;NaN
+7.5;NaN
+8.0;NaN

@@ -71,7 +71,7 @@ public class CauchyProblemSolving_OLD extends DifferentialEquation {
             throws Exception {
         this(null, rightSideFunction, initialCondition);
     }
-    public HashMap<String, Double> getParametersTable() {
+    public HashMap<String, Object> getParametersTable() {
         return parametersTable;
     }
     public InitialCondition getInitialCondition() {
@@ -118,8 +118,8 @@ public class CauchyProblemSolving_OLD extends DifferentialEquation {
             this.setParametersTable(pathToFileWithParameters);
         }
         int maxIterationsCount = 1000;
-        double stepOfMethod = this.parametersTable.get("StepOfMethod".toLowerCase());
-        double rightBorder = this.parametersTable.get("RightBorder".toLowerCase());
+        double stepOfMethod = (double) this.parametersTable.get("StepOfMethod".toLowerCase());
+        double rightBorder = (double) this.parametersTable.get("RightBorder".toLowerCase());
         Stack<Point2D> functionApproximations = new Stack<>();
         functionApproximations.push(new Point2D(
                 this.initialCondition.getX(), this.initialCondition.getY(this.equationsIndex)));
@@ -193,7 +193,7 @@ public class CauchyProblemSolving_OLD extends DifferentialEquation {
                 }
             }}, pathToParametersFile, initialConditions);
         }
-        public HashMap<String, Double> getParametersTable() {
+        public HashMap<String, Object> getParametersTable() {
             return parametersTable;
         }
         public InitialCondition getInitialConditions() {
@@ -274,8 +274,8 @@ public class CauchyProblemSolving_OLD extends DifferentialEquation {
                 super.updateVariablesList(List.of("step of method", "right border"));
                 this.setParametersTable(pathToFileWithParameters);
             }
-            double rightBorder = this.parametersTable.get("RightBorder".toLowerCase());
-            double stepOfMethod = this.parametersTable.get("StepOfMethod".toLowerCase());
+            double rightBorder = (double) this.parametersTable.get("RightBorder".toLowerCase());
+            double stepOfMethod = (double) this.parametersTable.get("StepOfMethod".toLowerCase());
             Stack<ArrayList<Point2D>> functionApproximations = new Stack<>(){{
                 ArrayList<Point2D> solutionsPoints = new ArrayList<>();
                 for (int i = 0; i < differentialEquationsSystem.size(); i++)
@@ -301,8 +301,8 @@ public class CauchyProblemSolving_OLD extends DifferentialEquation {
                 this.differentialEquationsSystem.get(equationIndex).setSolutionFunction(new MathFunctionOperations());
                 functionApproximations.forEach(approximations -> this.differentialEquationsSystem.get(finalEquationIndex)
                         .getSolutionFunction().addPoint(approximations.get(finalEquationIndex)));
-                this.differentialEquationsSystem.get(equationIndex).getSolutionFunction()
-                        .writePointsInFile("SolutionsFunction" + equationIndex + "PointsOutput.txt");
+                this.differentialEquationsSystem.get(equationIndex).getSolutionFunction().writePointsInFile(
+                        pathToSolutionsPointsOutput + "SolutionsFunction" + equationIndex + "PointsOutput.txt");
             }
         }
 
@@ -314,8 +314,8 @@ public class CauchyProblemSolving_OLD extends DifferentialEquation {
                 super.updateVariablesList(List.of("step of method", "right border"));
                 this.setParametersTable(pathToFileWithParameters);
             }
-            double stepOfMethod = this.parametersTable.get("StepOfMethod".toLowerCase());
-            double finalRightBorder = this.parametersTable.get("RightBorder".toLowerCase());
+            double stepOfMethod = (double) this.parametersTable.get("StepOfMethod".toLowerCase());
+            double finalRightBorder = (double) this.parametersTable.get("RightBorder".toLowerCase());
             double localRightBorder = this.initialConditions.getX() + stepOfMethod;
             InitialCondition localInitCondition = this.initialConditions.copy();
             while (localRightBorder <= finalRightBorder)
@@ -338,7 +338,7 @@ public class CauchyProblemSolving_OLD extends DifferentialEquation {
                                                 "epsilon = " + problemSolving.getEpsilon() + ";\n");
                                     }});
                     problemSolving.implicitAdamsMethod(equationSettingsFile.toString(),
-                            "CurrentSolutionFunctionPointsOutput.txt");
+                            "txt_files/CurrentSolutionFunctionPointsOutput.txt");
                     this.differentialEquationsSystem.get(equationIndex).getSolutionFunction()
                             .addPoints(problemSolving.getSolutionFunction().getPoints());
                     localInitCondition.setY(equationIndex, problemSolving.getSolutionFunction()

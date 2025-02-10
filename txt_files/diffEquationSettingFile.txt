@@ -1,4 +1,9 @@
 # parameters
+x grid dense = 63;
+time grid dense = 10;
+
+count of steps = 40;
+
 step of method = 0.25;
 right border = 3;
 epsilon = 1E-5;
