@@ -11,10 +11,10 @@ import java.util.stream.IntStream;
 public class Main {
     public static void main(String[] args) throws ReflectiveOperationException, IOException {
         double coefficient = 1, leftBord = 0, rightBord = 1;
-        MathFunction initFunc = (arg) -> new Point2D(arg.get(0), Math.cos(3 * Math.PI * arg.get(0) / 2));
-        MathFunction left = (arg) -> new Point2D(arg.get(0), 0);
-        MathFunction right = (arg) -> new Point2D(arg.get(0),
-                (2 / (3 * Math.PI)) * Math.exp(-Math.pow(3 * Math.PI / 2, 2) * arg.get(0)));
+        MathFunction initFunc = (arg) -> new Point2D(arg.getFirst(), Math.cos(3 * Math.PI * arg.getFirst() / 2));
+        MathFunction left = (arg) -> new Point2D(arg.getFirst(), 0);
+        MathFunction right = (arg) -> new Point2D(arg.getFirst(),
+                (2 / (3 * Math.PI)) * Math.exp(-Math.pow(3 * Math.PI / 2, 2) * arg.getFirst()));
         //MathFunction right = (arg) -> new Point2D(arg.get(0), 0);
         ThermalConductivityProblem problem = new ThermalConductivityProblem(coefficient, leftBord, rightBord,
                 initFunc, left, right);
