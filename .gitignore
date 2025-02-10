@@ -7,6 +7,8 @@ out/
 **/input.txt
 
 **.cs
+**/**.cs
+SweepMethod.cs
 
 ### Eclipse ###
 .apt_generated
